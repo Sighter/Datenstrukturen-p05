@@ -1,0 +1,7 @@
+*.swp
+*.o
+*.session
+tags
+main
+Sascha*
+*.zip
