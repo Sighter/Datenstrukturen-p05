@@ -8,14 +8,15 @@
 
 #include <stdio.h>
 
-#include "ChStack.h"
+//#define VERBOSE
+
 #include "ExpTree.h"
 #include "Helpers.h"
 
 int main(int argc, char* argv[])
 {
 
-    /** handle arguments
+    /** Hint 1: handle arguments
      *
      * We only treat the first argument
      */
@@ -23,7 +24,9 @@ int main(int argc, char* argv[])
     /* cancel if no expression is given */
     if (argc <= 1)
     {
+#ifdef VERBOSE
         printf("No expression given. Exiting ...\n");
+#endif
         return 1;
     }
     
@@ -32,7 +35,9 @@ int main(int argc, char* argv[])
 
     if (Helpers::StringLen(p_expression) == 0)
     {
+#ifdef VERBOSE
         printf("No expression given. Exiting ...\n");
+#endif
         return 1;
     }
 

@@ -92,7 +92,30 @@ TreeNode* Queue::Dequeue()
 }
 
 
-/* this method inserts a expression in the binary tree
+/* Exercise 1: this method inserts a expression in the binary tree.
+ *
+ * The algorithm uses two stacks one for internal and another for
+ * leaf nodes. The trick here is, if we have processed a closing bracket
+ * we push the operator to the "wrong" stack
+ *
+ * detailed:
+ *
+ * iterate through the string:
+ *     - if we find a opening bracket, just continue
+ *     - if we find an operand push it to the leaf stack 
+ *       here we take care of numbers with more than digits
+ *     - if we find an operator push it to the internal_stack
+ *     - if we find a closing bracket magic happens
+ *       we pop the from internal_stack, then we pop the first
+ *       child from the leaf_stack which have to be the right child
+ *       of the current popped operator. After that we pop the next
+ *       object from the leaf_stack wich will be the left child.
+ *       Now we push the operator tree node on the LEAF STACK!!.
+ *       So next time it is popped, it is treated like an operand.
+ *
+ * This algorithm works with "TreeNode"s only because the connections
+ * between the nodes have to be persistent. In Addition to this, it is
+ * neccessary that we have comletete paranthesized expression.
  *
  * @param a string
  */
@@ -279,7 +302,10 @@ void ExpTree::Mirror(TreeNode* pWalker)
 }
 
 
-/* this function evaluates a (sub-)tree recursive
+/* Exercise 2: this function evaluates a (sub-)tree recursive
+ *
+ * Here you find the recursive function for evaluating a expression
+ * tree. Algorithm is trivial and explained in the function body.
  *
  * @param the sub tree for recursion
  *
@@ -288,7 +314,7 @@ void ExpTree::Mirror(TreeNode* pWalker)
 TreeNode*
 ExpTree::EvaluateRek(TreeNode *pTreePart)
 {
-    /* check leaf status */
+    /* check leaf status to cancel the recursion */
     if (!pTreePart->pLeft && !pTreePart->pRight)
         return pTreePart;
     else
@@ -296,17 +322,28 @@ ExpTree::EvaluateRek(TreeNode *pTreePart)
         TreeNode* p_operand_1 = EvaluateRek(pTreePart->pLeft);
         TreeNode* p_operand_2 = EvaluateRek(pTreePart->pRight);
         
-        /* calc digits */
+        /* calculate the if we have two digits in the left and right
+         * subtrees */
         if (p_operand_1->IsDigit && p_operand_2->IsDigit)
         {
+            int cur_res = 0;
+
             if (pTreePart->Char == '+')
-                pTreePart->Digit = p_operand_1->Digit + p_operand_2->Digit;
+                cur_res = p_operand_1->Digit + p_operand_2->Digit;
             else if (pTreePart->Char == '-')
-                pTreePart->Digit = p_operand_1->Digit - p_operand_2->Digit;
+                cur_res = p_operand_1->Digit - p_operand_2->Digit;
             else if (pTreePart->Char == '*')
-                pTreePart->Digit = p_operand_1->Digit * p_operand_2->Digit;
+                cur_res = p_operand_1->Digit * p_operand_2->Digit;
             else if (pTreePart->Char == '/')
-                pTreePart->Digit = p_operand_1->Digit / p_operand_2->Digit;
+                cur_res = p_operand_1->Digit / p_operand_2->Digit;
+            else
+                return pTreePart;
+
+            /* Hint 2: If we have a negative result, we do not simplify anything */
+            if (cur_res < 0)
+                return pTreePart;
+
+            pTreePart->Digit = cur_res;
 
             /* delete the subtrees */
             DeleteRek(pTreePart->pLeft);
@@ -322,13 +359,18 @@ ExpTree::EvaluateRek(TreeNode *pTreePart)
             return pTreePart;
         }
         
-        /* special case where the op is / and the both childs has the same
+        /* special case where the op is / or - and the both childs has the same
          * variable name e.g. b/b */
-        if (pTreePart->Char == '/' &&
-            !pTreePart->pLeft->IsOperator && !pTreePart->pRight->IsOperator &&
+        if (!pTreePart->pLeft->IsOperator && !pTreePart->pRight->IsOperator &&
             pTreePart->pLeft->Char == pTreePart->pRight->Char)
         {
-            pTreePart->Digit = 1;
+            if (pTreePart->Char == '-')
+                pTreePart->Digit = 0;
+            else if (pTreePart->Char == '/')
+                pTreePart->Digit = 1;
+            else
+                return pTreePart;
+           
             pTreePart->IsDigit = true;
             pTreePart->IsOperator = false;
 
@@ -342,13 +384,80 @@ ExpTree::EvaluateRek(TreeNode *pTreePart)
             return pTreePart;
         }
 
+        /* special case where we have one variable and zero as operands */
+
+        /* 0 + a, 0 / a, 0 * a */
+        if (pTreePart->pLeft->IsDigit &&
+            pTreePart->pLeft->Digit == 0 &&
+            !pTreePart->pRight->IsOperator)
+        {
+            if (pTreePart->Char == '+')
+                pTreePart->Char = pTreePart->pRight->Char;
+            else if (pTreePart->Char == '/')
+            {
+                pTreePart->Digit = 0;
+                pTreePart->IsDigit = true;
+            }
+            else if (pTreePart->Char == '*')
+            {
+                pTreePart->Digit = 0;
+                pTreePart->IsDigit = true;
+            }
+            /* 0 - a is excluded */
+            else
+                return pTreePart;
+
+            /* delete subtrees */
+            DeleteRek(pTreePart->pLeft);
+            DeleteRek(pTreePart->pRight);
+
+            pTreePart->pLeft = NULL;
+            pTreePart->pRight = NULL;
+
+            pTreePart->IsOperator = false;
+
+            return pTreePart;
+        }
+
+        /* a + 0, a - 0, a * 0 */
+        if (pTreePart->pRight->IsDigit &&
+            pTreePart->pRight->Digit == 0 &&
+            !pTreePart->pLeft->IsOperator)
+        {
+            if (pTreePart->Char == '+' || pTreePart->Char == '-')
+                pTreePart->Char = pTreePart->pLeft->Char;
+            else if (pTreePart->Char == '*')
+            {
+                pTreePart->Digit = 0;
+                pTreePart->IsDigit = true;
+            }
+            /* a / 0 is excluded */
+            else
+                return pTreePart;
+
+            /* delete subtrees */
+            DeleteRek(pTreePart->pLeft);
+            DeleteRek(pTreePart->pRight);
+
+            pTreePart->pLeft = NULL;
+            pTreePart->pRight = NULL;
+
+            pTreePart->IsOperator = false;
+
+            return pTreePart;
+        }
     }
     /* if we are here no simplification is possible */ 
     return pTreePart;
 }
 
 
-/* method for creating a infix expression and write it to string
+/* Exercise 3: create an infix expression
+ *
+ * Because of the nature of an expression tree, we can parse the tree
+ * in inorder way to get an infix expression. It is also possible
+ * to parse an expression tree in postorder to get the postfix expression
+ * and in preorder to get the prefix expression.
  *
  * @param tree node for recusion
  * @param reference for index of the string 

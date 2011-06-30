@@ -28,7 +28,7 @@ CFLAGS=-c -g -xc++ \
 		-Wuninitialized \
 		-Weffc++
 
-TARGETS= main.o ChStack.o Helpers.o ExpTree.o TreeNodeStack.o
+TARGETS= main.o Helpers.o ExpTree.o TreeNodeStack.o
 		
 
 all: main

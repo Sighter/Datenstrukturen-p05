@@ -13,18 +13,13 @@
 #define NULL 0
 #endif
 
-#include "ChStack.h"
-
 /** class with some helper functions
  */
 class Helpers
 {
 public:
     static int  StringLen(char* pString);
-    static bool InfixToPostfix(char* pInfix, char* pPostfix);
 };
-
-
 
 
 #endif

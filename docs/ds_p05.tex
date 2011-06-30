@@ -1,0 +1,50 @@
+
+
+\documentclass{article}
+\usepackage{times}
+\usepackage{german}
+\usepackage{fancyhdr}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+
+\title{Datenstrukturen\\Praxiseinheit 4}
+\author
+{
+	Sascha Ebert\\
+	MatNr: 177182\\
+	\texttt{sascha.ebert@s2006.tu-chemnitz.de}\\
+	\texttt{https://github.com/Sighter/Datenstrukturen-p04}\\
+}
+
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Anbei finden sie Erläuterungen zu den Aufgaben der 4. Praxiseinheit.
+Alle anderen Programmcode-bezogenen Aufgaben finden sie im Quelltext an den jeweiligen Positionen
+erläutert. Es somit auch möglich das oben vermerkte Git-Repository zu nutzen um den Quelltext
+zu betrachten. Die aufgabenbezogenen Kommentare sind mit `Exercise' oder `Hint' gekennzeichnet.
+\end{abstract}
+
+\section*{Aufgabenzuordnung}
+\begin{tabular}{ c l l }
+  Aufgabe & Datei & Funktion/Methode\\
+  \hline
+  a & biTree.h, StringList.h & *\\
+  b & biTree.cpp & biTree\_t::exists()\\
+  c & biTree.cpp & biTree\_t::count()\\
+  d & biTree.cpp & biTree\_t::insert()\\
+  \hline
+  hint 1 & biTree.cpp & biTree\_t::insertRek()\\
+  hint 4 & main.cpp & main()\\
+\end{tabular}
+
+\section*{Anmerkungen}
+Alle Rufe auf externe libraries wurden mit der Preprozessor-Anweisung ''\#ifdef VERBOSE'' geklammert.
+Sie können also mit der Anweisung ''\#define VERBOSE'' die printf-Funktionalität wieder herstellen.
+
+\end{document}
+
+

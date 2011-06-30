@@ -3,7 +3,7 @@
 #ifndef EXPTREE_H
 #define EXPTREE_H
 
-#define VERBOSE
+//#define VERBOSE
 
 #ifdef VERBOSE
 #include <stdio.h>
